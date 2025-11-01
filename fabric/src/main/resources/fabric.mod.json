@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "gaboulibs",
   "version": "${version}",
-  "name": "untitled1",
-  "description": "",
+  "name": "GabousLibs",
+  "description": "Common utilities shared across Gabou's mods.",
   "authors": [
     "Gabou"
   ],

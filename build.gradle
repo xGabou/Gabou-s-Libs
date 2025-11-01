@@ -29,6 +29,13 @@ subprojects {
         // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
         // See https://docs.gradle.org/current/userguide/declaring_repositories.html
         // for more information about repositories.
+        maven {
+            name = "CurseMaven"
+            url = "https://cursemaven.com"
+        }
+        maven {
+            url = "https://api.modrinth.com/maven"
+        }
     }
 
     dependencies {
@@ -42,12 +49,12 @@ subprojects {
         // If you remove this line, sources will not be generated.
         withSourcesJar()
 
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     tasks.withType(JavaCompile).configureEach {
-        it.options.release = 17
+        it.options.release = 21
     }
 
     // Configure Maven publishing.
@@ -61,10 +68,21 @@ subprojects {
 
         // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
         repositories {
-            // Add repositories to publish to here.
-            // Notice: This block does NOT have the same function as the block in the top level.
+            // Local development publishing targets
+            mavenLocal()
+            maven {
+                name = "localBuildRepo"
+                url = uri("${rootProject.buildDir}/maven-repo")
+            }
             // The repositories here will be used for publishing your artifact, not for
             // retrieving dependencies.
         }
     }
+}
+
+// Convenience task to publish all platform jars to mavenLocal
+tasks.register('publishAllToMavenLocal') {
+    group = 'publishing'
+    description = 'Publishes common, fabric and forge modules to mavenLocal.'
+    dependsOn ':common:publishToMavenLocal', ':fabric:publishToMavenLocal', ':forge:publishToMavenLocal'
 }
