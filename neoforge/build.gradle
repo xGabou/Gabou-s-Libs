@@ -8,6 +8,11 @@ architectury {
     platformSetupLoomIde()
     neoForge()
 }
+sourceSets {
+    main {
+        resources.srcDir project(':common').file('src/main/resources')
+    }
+}
 
 configurations {
     common {
@@ -16,7 +21,7 @@ configurations {
     }
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentForge.extendsFrom common
+    developmentNeoForge.extendsFrom common
 
     // Files in this configuration will be bundled into your mod using the Shadow plugin.
     // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
@@ -63,8 +68,8 @@ modrinth {
     versionNumber = "Forge-${project.version}"
     versionName = "Gabou's Libs ${mod_version}"
     changelog = rootProject.file("GabousLibs.md").text
-    gameVersions = ["1.20.1"]
-    loaders = ["forge"]
+    gameVersions = ["1.21.1"]
+    loaders = ["neoforge"]
     versionType = "release"
     uploadFile = file("build/libs/${archivesBaseName}-${version}.jar")
 }
@@ -75,8 +80,8 @@ curseforge {
         id = "1367332"
         changelog = rootProject.file("GabousLibs.md")
         releaseType = "release" // options: alpha, beta, release
-        addGameVersion "1.20.1"
-        addGameVersion "Forge"
+        addGameVersion "1.21.1"
+        addGameVersion "NeoForge"
         mainArtifact(file("build/libs/${archivesBaseName}-${version}.jar")) {
             displayName = "Forge-${version}"
         }

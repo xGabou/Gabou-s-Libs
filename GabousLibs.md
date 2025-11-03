@@ -4,8 +4,8 @@
 
 
 ### Changed
--Changed CompatUtil to accommodate Yarn's mapping.
 
 ### Fixed
+- Fix a crash related to mixins
 
 
