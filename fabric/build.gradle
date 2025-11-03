@@ -6,6 +6,11 @@ architectury {
     platformSetupLoomIde()
     fabric()
 }
+sourceSets {
+    main {
+        resources.srcDir project(':common').file('src/main/resources')
+    }
+}
 
 configurations {
     common {
