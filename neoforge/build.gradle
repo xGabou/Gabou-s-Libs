@@ -65,7 +65,7 @@ remapJar {
 modrinth {
     token = System.getenv("MODRINTH_TOKEN")
     projectId = "N8aGZtvj" // from your Modrinth project URL
-    versionNumber = "Forge-${project.version}"
+    versionNumber = "NeoForge-${project.version}"
     versionName = "Gabou's Libs ${mod_version}"
     changelog = rootProject.file("GabousLibs.md").text
     gameVersions = ["1.21.1"]
@@ -83,7 +83,7 @@ curseforge {
         addGameVersion "1.21.1"
         addGameVersion "NeoForge"
         mainArtifact(file("build/libs/${archivesBaseName}-${version}.jar")) {
-            displayName = "Forge-${version}"
+            displayName = "NeoForge-${version}"
         }
     }
 }
