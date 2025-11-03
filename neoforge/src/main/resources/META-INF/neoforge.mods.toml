@@ -1,33 +1,33 @@
 modLoader = "javafml"
-loaderVersion = "[2,)"
+loaderVersion = "[4,)"
 #issueTrackerURL = ""
 license = "All Rights Reserved"
 
 [[mods]]
-modId = "untitled2"
+modId = "gaboulibs"
 version = "${version}"
-displayName = "untitled2"
+displayName = "Gabou's Libs"
 authors = "Gabou"
 description = '''
-
+Common utilities shared across Gabou's mods.
 '''
-#logoFile = ""
+#logoFile = "assets/gaboulibs/icon.png"
 
-[[dependencies.untitled2]]
+[[dependencies.gaboulibs]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21,)"
+versionRange = "[21.1.0,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.untitled2]]
+[[dependencies.gaboulibs]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.1,)"
+versionRange = "[1.21.1,1.22)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.untitled2]]
+[[dependencies.gaboulibs]]
 modId = "architectury"
 type = "required"
 versionRange = "[13.0.8,)"

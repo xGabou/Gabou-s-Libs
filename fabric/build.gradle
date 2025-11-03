@@ -9,6 +9,12 @@ architectury {
     fabric()
 }
 
+sourceSets {
+    main {
+        resources.srcDir project(':common').file('src/main/resources')
+    }
+}
+
 configurations {
     common {
         canBeResolved = true
@@ -53,29 +59,31 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
 }
-modrinth {
-    token = System.getenv("MODRINTH_TOKEN")
-    projectId = "N8aGZtvj" // from your Modrinth project URL
-    versionNumber = "Fabric-${project.version}"
-    versionName = "Serene Seasons Plus ${mod_version}"
-    changelog = rootProject.file("GabousLibs.md").text
-    gameVersions = ["1.20.1"]
-    loaders = ["fabric"]
-    versionType = "release"
-    uploadFile = file("build/libs/${archivesBaseName}-${version}.jar")
-}
-curseforge {
-    apiKey = System.getenv("CURSEFORGE_TOKEN")
-
-    project {
-        id = "1367332"
-        changelog = rootProject.file("GabousLibs.md")
-        releaseType = "release" // options: alpha, beta, release
-        addGameVersion "1.20.1"
-        addGameVersion "Fabric"
-        mainArtifact(file("build/libs/${archivesBaseName}-${version}.jar")) {
-            displayName = "Fabric-${version}"
-        }
-    }
-}
+// Mod publishing is disabled in CI/test runs to avoid requiring API tokens.
+// Uncomment these blocks locally when preparing a release.
+//modrinth {
+//    token = System.getenv("MODRINTH_TOKEN")
+//    projectId = "N8aGZtvj" // from your Modrinth project URL
+//    versionNumber = "Fabric-${project.version}"
+//    versionName = "Serene Seasons Plus ${mod_version}"
+//    changelog = rootProject.file("GabousLibs.md").text
+//    gameVersions = ["1.20.1"]
+//    loaders = ["fabric"]
+//    versionType = "release"
+//    uploadFile = file("build/libs/${archivesBaseName}-${version}.jar")
+//}
+//curseforge {
+//    apiKey = System.getenv("CURSEFORGE_TOKEN")
+//
+//    project {
+//        id = "1367332"
+//        changelog = rootProject.file("GabousLibs.md")
+//        releaseType = "release" // options: alpha, beta, release
+//        addGameVersion "1.20.1"
+//        addGameVersion "Fabric"
+//        mainArtifact(file("build/libs/${archivesBaseName}-${version}.jar")) {
+//            displayName = "Fabric-${version}"
+//        }
+//    }
+//}
 
