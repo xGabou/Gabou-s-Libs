@@ -26,12 +26,12 @@ public abstract class ScreenMixin implements IScreen {
 
     @Shadow protected Minecraft minecraft;
 
-    // --- Invokers for protected instance methods ---
-    @Invoker("renderMenuBackground")
-    protected abstract void sereneseasonsplus$invokeRenderMenuBackground(GuiGraphics guiGraphics);
+    // These are the protected methods from Screen
+    @Shadow
+    protected abstract void renderPanorama(GuiGraphics guiGraphics, float f);
 
-    @Invoker("renderPanorama")
-    protected abstract void sereneseasonsplus$invokeRenderPanorama(GuiGraphics guiGraphics, float partialTick);
+    @Shadow
+    protected abstract void renderMenuBackground(GuiGraphics guiGraphics);
 
     /**
      * Renders all widgets without drawing any background.
@@ -51,10 +51,10 @@ public abstract class ScreenMixin implements IScreen {
     public void sereneseasonsplus$renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.minecraft.level == null) {
             // ✅ Just call the invoker normally — no cast needed
-            this.sereneseasonsplus$invokeRenderPanorama(guiGraphics, partialTick);
+            this.renderPanorama(guiGraphics, partialTick);
         }
 
-        this.sereneseasonsplus$invokeRenderMenuBackground(guiGraphics);
+        this.renderMenuBackground(guiGraphics);
     }
 
     @Unique
@@ -63,3 +63,6 @@ public abstract class ScreenMixin implements IScreen {
         this.minecraft.getMainRenderTarget().bindWrite(false);
     }
 }
+
+
+
