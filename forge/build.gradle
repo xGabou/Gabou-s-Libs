@@ -60,3 +60,25 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
 }
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = group          // your group
+            artifactId = 'gaboulibs_forge'       // your library name
+            version = project.version              // update per release
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/xGabou/Gabou-s-Libs")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}

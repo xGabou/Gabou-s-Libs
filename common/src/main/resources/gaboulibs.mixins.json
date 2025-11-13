@@ -1,5 +1,5 @@
 {
-  "required": true,
+  "required": false,
   "package": "net.Gabou.gaboulibs.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
