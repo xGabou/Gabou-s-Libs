@@ -78,3 +78,37 @@ publishing {
         }
     }
 }
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = "N8aGZtvj" // from your Modrinth project URL
+    versionNumber = "Fabric-${project.version}"
+    versionName = "Gabou's Libs${mod_version}"
+    changelog = rootProject.file("gabous.md").text
+    gameVersions = ["1.20.1"]
+    loaders = ["fabric"]
+    versionType = "release"
+    dependencies {
+        required.project "lhGA9TYQ"
+    }
+    uploadFile = file("build/libs/${archivesBaseName}-${version}.jar")
+}
+def curseForgeToken = System.getenv("CURSEFORGE_TOKEN")?.trim()
+if (curseForgeToken) {
+    curseforge {
+        apiKey = curseForgeToken
+
+        project {
+            id = "1367332"
+            changelog = rootProject.file("gabous.md")
+            releaseType = "release" // options: alpha, beta, release
+            addGameVersion "1.20.1"
+            addGameVersion "Fabric"
+            mainArtifact(file("build/libs/${archivesBaseName}-${version}.jar")) {
+                displayName = "Fabric-${version}"
+            }
+        }
+    }
+} else {
+    logger.lifecycle("CURSEFORGE_TOKEN not set; CurseForge upload tasks will be disabled.")
+    tasks.matching { it.name.toLowerCase().contains("curseforge") }.configureEach { enabled = false }
+}
