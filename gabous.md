@@ -3,5 +3,5 @@
 ### Added
 
 ### Fixed / Behavior
--Fixed a mixin bug
 ### Changed
+-Migrated a class to Gabou's Libs to reduce code duplication across mods.
