@@ -2,7 +2,7 @@ package net.Gabou.gaboulibs.util;
 
 import dev.architectury.platform.Platform;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

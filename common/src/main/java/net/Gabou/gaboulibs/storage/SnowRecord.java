@@ -19,11 +19,11 @@ public class SnowRecord {
 
     public static SnowRecord fromTag(CompoundTag tag) {
         SnowRecord r = new SnowRecord();
-        r.minLayers = tag.getFloat("MinLayers");
-        r.avgLayers = tag.getFloat("AvgLayers");
-        r.maxLayers = tag.getFloat("MaxLayers");
+        r.minLayers = tag.getFloat("MinLayers").get();
+        r.avgLayers = tag.getFloat("AvgLayers").get();
+        r.maxLayers = tag.getFloat("MaxLayers").get();
         if (tag.contains("DistributionPattern")) {
-            r.distributionPattern = tag.getIntArray("DistributionPattern");
+            r.distributionPattern = tag.getIntArray("DistributionPattern").get();
         }
         return r;
     }

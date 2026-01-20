@@ -27,8 +27,6 @@ public class AttributeSync {
         );
 
         player.connection.send(packet);
-
-        ServerLevel level = player.serverLevel();
-        level.getChunkSource().broadcast(player, packet);
     }
+
 }
