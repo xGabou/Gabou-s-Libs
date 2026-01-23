@@ -102,7 +102,8 @@ modrinth {
 
         project {
             id = "1367332"
-            changelog = rootProject.file("gabous.md")
+            changelogType = "markdown"
+            changelog = rootProject.file("gabous.md").text
             releaseType = "release" // options: alpha, beta, release
             addGameVersion "1.20.1"
             addGameVersion "Forge"

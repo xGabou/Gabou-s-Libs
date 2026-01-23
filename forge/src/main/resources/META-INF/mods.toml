@@ -6,7 +6,7 @@ license = "All Rights Reserved"
 [[mods]]
 modId = "gaboulibs"
 version = "${version}"
-displayName = "untitled1"
+displayName = "gaboulibs"
 authors = "Gabou"
 description = '''
 
