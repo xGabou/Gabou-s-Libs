@@ -80,7 +80,7 @@ public class CompatUtils {
                 }
                 return overridden;
             }
-            return PaSspHost.SERENE_SEASONS_PLUS;
+            return PaSspHost.PROJECT_ATMOSPHERE;
         }
 
         if (paLoaded) {
