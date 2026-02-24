@@ -71,7 +71,7 @@ modrinth {
     versionNumber = "Fabric-${project.version}"
     versionName = "Serene Seasons Plus ${mod_version}"
     changelog = rootProject.file("GabousLibs.md").text
-    gameVersions = ["1.21.8"]
+    gameVersions = ["1.21.4"]
     loaders = ["fabric"]
     versionType = "release"
     uploadFile = remappedJar
@@ -84,7 +84,7 @@ curseforge {
         id = "1367332"
         changelog = rootProject.file("GabousLibs.md")
         releaseType = "release"
-        addGameVersion "1.21.8"
+        addGameVersion "1.21.4"
         addGameVersion "Fabric"
         mainArtifact(remappedJar) {
             displayName = "Fabric-${version}"
