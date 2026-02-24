@@ -86,3 +86,34 @@ tasks.register('publishAllToMavenLocal') {
     description = 'Publishes common, fabric and forge modules to mavenLocal.'
     dependsOn ':common:publishToMavenLocal', ':fabric:publishToMavenLocal', ':forge:publishToMavenLocal'
 }
+import groovy.json.JsonOutput
+tasks.register("discordWebhook") {
+    doLast {
+        def webhookUrl = System.getenv("DISCORD_WEBHOOK_URL")?.trim()
+        if (!webhookUrl) {
+            println "Skipping Discord webhook notification: DISCORD_WEBHOOK_URL not set."
+            return
+        }
+
+        def changelogText = rootProject.file("gabouslibs.md").text
+
+        def payload = [
+                username        : "Build Bot",
+                allowed_mentions: [parse: ["roles"]],
+                content         : "**New release published!** 🎉\n" +
+                        "Project: ${archives_name}\n" +
+                        "Version: v${project.mod_version}-1.21.9\n\n" +
+                        "${changelogText.take(1891)}"
+        ]
+
+        println "Sending release notification to Discord..."
+        def connection = new URL(webhookUrl).openConnection()
+        connection.with {
+            doOutput = true
+            requestMethod = "POST"
+            setRequestProperty("Content-Type", "application/json")
+            outputStream.withWriter("UTF-8") { it << JsonOutput.toJson(payload) }
+            println "Webhook sent with response code: ${responseCode}"
+        }
+    }
+}

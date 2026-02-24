@@ -1,7 +1,7 @@
 
 package net.Gabou.gaboulibs.util;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class AtmosphericPhysics {
 
@@ -45,7 +45,7 @@ public class AtmosphericPhysics {
         float angle = (gameTime % 24000L) / 24000f * 2f * (float) Math.PI;
         return Math.max(0f, (float) Math.sin(angle)); 
     }
-    public static float getAlbedo(Identifier biome) {
+    public static float getAlbedo(ResourceLocation biome) {
         String path = biome.getPath();
         if (path.contains("snow") || path.contains("ice")) return 0.9f;
         if (path.contains("desert") || path.contains("beach")) return 0.6f;
