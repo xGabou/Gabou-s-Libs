@@ -4,14 +4,20 @@ plugins {
     id "com.modrinth.minotaur" version "2.8.10" // Modrinth uploader
 }
 
-architectury {
-    platformSetupLoomIde()
-    fabric()
+loom {
+    forge {
+        mixinConfig "gaboulibs.mixins.json"
+    }
 }
 sourceSets {
     main {
         resources.srcDir project(':common').file('src/main/resources')
     }
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
 }
 
 configurations {
@@ -21,7 +27,7 @@ configurations {
     }
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentFabric.extendsFrom common
+    developmentForge.extendsFrom common
 
     // Files in this configuration will be bundled into your mod using the Shadow plugin.
     // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
@@ -32,22 +38,21 @@ configurations {
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+    forge "net.minecraftforge:forge:$rootProject.forge_version"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+    // Architectury API. This is optional, and you can comment it out if you don't need it.
+    modImplementation "dev.architectury:architectury-forge:$rootProject.architectury_api_version"
+    compileOnly "curse.maven:serene-seasons-291874:5206531"
 
-    modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
-    compileOnly "curse.maven:serene-seasons-291874:5206535"
-
-    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
-    shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+    common(project(path: ':common', configuration: 'namedElements')) { transitive = false }
+    shadowBundle project(path: ':common', configuration: 'transformProductionForge')
 }
 
 processResources {
     inputs.property 'version', project.version
 
-    filesMatching('fabric.mod.json') {
-        expand version: project.version
+    filesMatching('META-INF/mods.toml') {
+        expand version: inputs.properties.version
     }
 }
 
@@ -60,45 +65,30 @@ shadowJarTask.configure {
 }
 
 remapJarTask.configure {
-    input.set(shadowJarTask.flatMap { it.archiveFile })
-    archiveClassifier.set('')
+    inputFile.set(shadowJarTask.flatMap { it.archiveFile })
 }
-
-tasks.named('build') {
-    dependsOn(shadowJarTask)
-}
-
-shadowJarTask.configure {
-    finalizedBy(remapJarTask)
-}
-
-def remappedJar = remapJarTask.flatMap { it.archiveFile }
-
 modrinth {
     token = System.getenv("MODRINTH_TOKEN")
-    projectId = "N8aGZtvj"
-    versionNumber = "Fabric-${project.version}"
-    versionName = "Serene Seasons Plus ${mod_version}"
+    projectId = "N8aGZtvj" // from your Modrinth project URL
+    versionNumber = "Forge-${project.version}"
+    versionName = "Gabou's Libs ${mod_version}"
     changelog = rootProject.file("GabousLibs.md").text
     gameVersions = ["1.20.4"]
-    loaders = ["fabric"]
+    loaders = ["forge"]
     versionType = "release"
-    uploadFile = remappedJar
+    uploadFile = file("build/libs/${archivesBaseName}-${version}.jar")
 }
-
 curseforge {
     apiKey = System.getenv("CURSEFORGE_TOKEN")
 
     project {
         id = "1367332"
         changelog = rootProject.file("GabousLibs.md")
-        releaseType = "release"
+        releaseType = "release" // options: alpha, beta, release
         addGameVersion "1.20.4"
-        addGameVersion "Fabric"
-        mainArtifact(remappedJar) {
-            displayName = "Fabric-${version}"
+        addGameVersion "Forge"
+        mainArtifact(file("build/libs/${archivesBaseName}-${version}.jar")) {
+            displayName = "Forge-${version}"
         }
     }
 }
-
-

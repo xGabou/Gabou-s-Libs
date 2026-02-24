@@ -11,5 +11,6 @@ rootProject.name = 'gaboulibs'
 
 include 'common'
 include 'fabric'
+include 'forge'
 include 'neoforge'
 

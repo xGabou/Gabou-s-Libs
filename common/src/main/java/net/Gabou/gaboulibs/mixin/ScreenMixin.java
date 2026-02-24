@@ -59,7 +59,16 @@ public abstract class ScreenMixin implements IScreen {
 
     @Unique
     protected void sereneseasonsplus$renderBlurredBackground(float partialTick) {
-        this.minecraft.gameRenderer.processBlurEffect(partialTick);
+        var renderer = this.minecraft.gameRenderer;
+        try {
+            renderer.getClass().getMethod("processBlurEffect", float.class).invoke(renderer, partialTick);
+        } catch (ReflectiveOperationException ignored) {
+            try {
+                renderer.getClass().getMethod("processBlurEffect").invoke(renderer);
+            } catch (ReflectiveOperationException ignoredAgain) {
+                // Method signature varies across mappings/versions; skip blur if unavailable.
+            }
+        }
         this.minecraft.getMainRenderTarget().bindWrite(false);
     }
 }
