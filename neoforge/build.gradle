@@ -1,6 +1,9 @@
+import io.github.themrmilchmann.gradle.publish.curseforge.ChangelogFormat
+import io.github.themrmilchmann.gradle.publish.curseforge.ReleaseType
+
 plugins {
-    id 'com.github.johnrengelman.shadow'
-    id 'com.matthewprenger.cursegradle' version '1.4.0' // CurseForge uploader
+    id 'com.gradleup.shadow'
+    id "io.github.themrmilchmann.curseforge-publish" version "0.9.0"
     id "com.modrinth.minotaur" version "2.8.10" // Modrinth uploader
 }
 
@@ -40,10 +43,10 @@ repositories {
 dependencies {
     neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
 
-    modImplementation "dev.architectury:architectury-neoforge:$rootProject.architectury_api_version"
+    implementation "dev.architectury:architectury-neoforge:$rootProject.architectury_api_version"
 
-    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
-    shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
+    common(project(':common')) { transitive false }
+    shadowBundle project(':common')
 }
 
 processResources {
@@ -59,32 +62,41 @@ shadowJar {
     archiveClassifier = 'dev-shadow'
 }
 
-remapJar {
-    input.set shadowJar.archiveFile
+curseforge {
+    apiToken = System.getenv("CURSEFORGE_TOKEN")
+
+    publications {
+        register("curseForge") {
+            projectId = "1367332"
+
+            gameVersion "minecraft", rootProject.minecraft_version
+            gameVersion "modloader", "neoforge"
+
+            artifacts.register("main") {
+                displayName = "NeoForge-${project.version}"
+                releaseType = ReleaseType.RELEASE
+
+                changelog {
+                    format = ChangelogFormat.MARKDOWN
+                    from(rootProject.file("GabousLibs.md"))
+                }
+
+                from(tasks.named("shadowJar"))
+            }
+        }
+    }
 }
+
+def packagedJar = tasks.shadowJar.archiveFile
 modrinth {
     token = System.getenv("MODRINTH_TOKEN")
     projectId = "N8aGZtvj" // from your Modrinth project URL
     versionNumber = "NeoForge-${project.version}"
     versionName = "Gabou's Libs ${mod_version}"
     changelog = rootProject.file("GabousLibs.md").text
-    gameVersions = ["1.21.11"]
+    gameVersions = ["26.1.2"]
     loaders = ["neoforge"]
     versionType = "release"
-    uploadFile = file("build/libs/${archivesBaseName}-${version}.jar")
-}
-curseforge {
-    apiKey = System.getenv("CURSEFORGE_TOKEN")
-
-    project {
-        id = "1367332"
-        changelog = rootProject.file("GabousLibs.md")
-        releaseType = "release" // options: alpha, beta, release
-        addGameVersion "1.21.11"
-        addGameVersion "NeoForge"
-        mainArtifact(file("build/libs/${archivesBaseName}-${version}.jar")) {
-            displayName = "NeoForge-${version}"
-        }
-    }
+    uploadFile = packagedJar
 }
 
