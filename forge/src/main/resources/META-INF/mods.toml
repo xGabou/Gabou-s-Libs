@@ -30,6 +30,6 @@ side = "BOTH"
 [[dependencies.gaboulibs]]
 modId = "architectury"
 mandatory = true
-versionRange = "[11.1.17,)"
+versionRange = "[9.0.0,)"
 ordering = "AFTER"
 side = "BOTH"
