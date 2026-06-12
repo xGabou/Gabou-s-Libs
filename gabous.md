@@ -3,4 +3,4 @@
 ### Added
 ### Fixed / Behavior
 ### Changed
-- Changed the default fallback for CompatUtils
+- SnowGenerator: Added getter and setter for the `snowHeight` field, allowing users to customize the height of the generated snow.
