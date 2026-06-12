@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerLevel;
  * can access per-world saved data without requiring a level parameter.
  *
  * The reference is set on server start and cleared on server stop by
- * {@link EnvironmentHelper}.
+ * the main mod class. It is volatile to ensure visibility across threads.
  */
 public final class WorldContext {
     private static volatile ServerLevel OVERWORLD;

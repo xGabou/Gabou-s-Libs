@@ -1,11 +1,6 @@
-# Gabou's Libs
+# Gabou's Libs - Changelog
 
 ### Added
--Port to version 1.7.1
-
-
+### Fixed / Behavior
 ### Changed
-
-### Fixed
-
-
+- SnowGenerator: Added getter and setter for the `snowHeight` field, allowing users to customize the height of the generated snow.
