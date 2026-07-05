@@ -8,8 +8,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 public final class ModNetworking {
-    public static final ResourceLocation AUTH_CHALLENGE_PACKET_ID = new ResourceLocation(Gaboulibs.MOD_ID, "auth_challenge");
-    public static final ResourceLocation AUTH_CHALLENGE_REPLY_PACKET_ID = new ResourceLocation(Gaboulibs.MOD_ID, "auth_challenge_reply");
+    public static final ResourceLocation AUTH_CHALLENGE_PACKET_ID = ResourceLocation.fromNamespaceAndPath(Gaboulibs.MOD_ID, "auth_challenge");
+    public static final ResourceLocation AUTH_CHALLENGE_REPLY_PACKET_ID = ResourceLocation.fromNamespaceAndPath(Gaboulibs.MOD_ID, "auth_challenge_reply");
 
     private static ModNetworkingPlatform platform = ModNetworkingPlatform.NOOP;
     private static boolean initialized = false;

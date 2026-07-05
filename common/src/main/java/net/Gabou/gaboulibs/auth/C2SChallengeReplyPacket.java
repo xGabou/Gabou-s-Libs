@@ -3,10 +3,18 @@ package net.Gabou.gaboulibs.auth;
 import net.Gabou.gaboulibs.ModNetworking;
 import net.Gabou.gaboulibs.util.NetworkPayload;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record C2SChallengeReplyPacket(long nonce, String response, String launcherReason) implements NetworkPayload {
     public static final ResourceLocation ID = ModNetworking.AUTH_CHALLENGE_REPLY_PACKET_ID;
+    public static final CustomPacketPayload.Type<C2SChallengeReplyPacket> TYPE = new CustomPacketPayload.Type<>(ID);
+    public static final StreamCodec<RegistryFriendlyByteBuf, C2SChallengeReplyPacket> STREAM_CODEC = CustomPacketPayload.codec(
+        C2SChallengeReplyPacket::write,
+        C2SChallengeReplyPacket::decode
+    );
 
     public static C2SChallengeReplyPacket decode(FriendlyByteBuf buffer) {
         return new C2SChallengeReplyPacket(buffer.readLong(), buffer.readUtf(128), buffer.readUtf(256));
@@ -18,8 +26,8 @@ public record C2SChallengeReplyPacket(long nonce, String response, String launch
     }
 
     @Override
-    public ResourceLocation id() {
-        return ID;
+    public CustomPacketPayload.Type<C2SChallengeReplyPacket> type() {
+        return TYPE;
     }
 
     @Override

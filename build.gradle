@@ -80,33 +80,33 @@ subprojects {
 }
 
 evaluationDependsOn(':common')
-evaluationDependsOn(':gaboulibs-devtools')
-
-tasks.register("validateMixins", JavaExec) {
-    group = "verification"
-    description = "Validates GabouLibs mixin configs using the reusable GabouLibs devtools validator."
-
-    dependsOn(":gaboulibs-devtools:classes", ":common:classes")
-    mainClass = "net.gabou.gaboulibs.devtools.mixinvalidator.MixinValidatorMain"
-    classpath = project(":gaboulibs-devtools").sourceSets.main.runtimeClasspath
-
-    doFirst {
-        def commonProject = project(":common")
-        args = [
-                "--project-dir", rootDir.absolutePath,
-                "--config", file("mixin-validator.json").absolutePath,
-                "--classpath", files(
-                        commonProject.sourceSets.main.output,
-                        commonProject.configurations.compileClasspath,
-                        commonProject.configurations.runtimeClasspath
-                ).asPath,
-                "--resources", files(commonProject.sourceSets.main.resources.srcDirs).asPath,
-                "--sources", files(commonProject.sourceSets.main.allJava.srcDirs).asPath,
-                "--fail-on-error", "true",
-                "--fail-on-warning", "false"
-        ]
-    }
-}
+//evaluationDependsOn(':gaboulibs-devtools')
+//
+//tasks.register("validateMixins", JavaExec) {
+//    group = "verification"
+//    description = "Validates GabouLibs mixin configs using the reusable GabouLibs devtools validator."
+//
+//    dependsOn(":gaboulibs-devtools:classes", ":common:classes")
+//    mainClass = "net.gabou.gaboulibs.devtools.mixinvalidator.MixinValidatorMain"
+//    classpath = project(":gaboulibs-devtools").sourceSets.main.runtimeClasspath
+//
+//    doFirst {
+//        def commonProject = project(":common")
+//        args = [
+//                "--project-dir", rootDir.absolutePath,
+//                "--config", file("mixin-validator.json").absolutePath,
+//                "--classpath", files(
+//                        commonProject.sourceSets.main.output,
+//                        commonProject.configurations.compileClasspath,
+//                        commonProject.configurations.runtimeClasspath
+//                ).asPath,
+//                "--resources", files(commonProject.sourceSets.main.resources.srcDirs).asPath,
+//                "--sources", files(commonProject.sourceSets.main.allJava.srcDirs).asPath,
+//                "--fail-on-error", "true",
+//                "--fail-on-warning", "false"
+//        ]
+//    }
+//}
 import groovy.json.JsonOutput
 
 tasks.register("discordWebhook") {

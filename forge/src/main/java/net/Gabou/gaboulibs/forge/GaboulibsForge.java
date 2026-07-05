@@ -1,10 +1,10 @@
-package net.Gabou.gaboulibs.forge;
+package net.Gabou.gaboulibs.neoforge;
 
 import net.Gabou.gaboulibs.Gaboulibs;
 import dev.architectury.platform.forge.EventBuses;
 import net.Gabou.gaboulibs.ModNetworking;
-import net.Gabou.gaboulibs.forge.auth.Identity2ForgeNetworkingPlatform;
-import net.Gabou.gaboulibs.forge.client.GaboulibsForgeClient;
+import net.Gabou.gaboulibs.neoforge.auth.Identity2ForgeNetworkingPlatform;
+import net.Gabou.gaboulibs.neoforge.client.GaboulibsForgeClient;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;

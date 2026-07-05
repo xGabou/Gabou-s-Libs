@@ -1,12 +1,12 @@
 package net.Gabou.gaboulibs.util;
 
 import dev.architectury.networking.NetworkManager;
-import io.netty.buffer.Unpooled;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public final class NetworkCompat {
     private NetworkCompat() {
@@ -16,30 +16,23 @@ public final class NetworkCompat {
         if (player == null || payload == null) {
             return;
         }
-        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
-        payload.write(buffer);
-        NetworkManager.sendToPlayer(player, payload.id(), buffer);
+        NetworkManager.sendToPlayer(player, payload);
     }
 
     public static <T extends NetworkPayload> void sendToServer(T payload) {
         if (payload == null) {
             return;
         }
-        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
-        payload.write(buffer);
-        NetworkManager.sendToServer(payload.id(), buffer);
+        NetworkManager.sendToServer(payload);
     }
 
-    public static <T> void registerReceiver(
+    public static <T extends NetworkPayload> void registerReceiver(
         NetworkManager.Side side,
-        net.minecraft.resources.ResourceLocation id,
-        Function<FriendlyByteBuf, T> decoder,
+        CustomPacketPayload.Type<T> type,
+        StreamCodec<? super RegistryFriendlyByteBuf, T> codec,
         BiConsumer<T, NetworkManager.PacketContext> handler
     ) {
-        NetworkManager.registerReceiver(side, id, (buffer, context) -> {
-            T payload = decoder.apply(buffer);
-            handler.accept(payload, context);
-        });
+        NetworkManager.registerReceiver(side, type, codec, handler::accept);
     }
 }
 

@@ -2,7 +2,7 @@ package net.Gabou.gaboulibs.neoforge.client;
 
 import net.Gabou.gaboulibs.client.GaboulibsClientBootstrap;
 
-public class GaboulibsForgeClient {
+public class GaboulibsNeoForgeClient {
     private static boolean initialized = false;
 
     public static void initialize() {

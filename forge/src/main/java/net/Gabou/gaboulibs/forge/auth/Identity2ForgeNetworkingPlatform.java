@@ -1,4 +1,4 @@
-package net.Gabou.gaboulibs.forge.auth;
+package net.Gabou.gaboulibs.neoforge.auth;
 
 import net.Gabou.gaboulibs.Gaboulibs;
 import net.Gabou.gaboulibs.auth.*;

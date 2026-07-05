@@ -1,4 +1,4 @@
-package net.Gabou.gaboulibs.fabric.auth;
+package net.Gabou.gaboulibs.neoforge.auth;
 
 import dev.architectury.networking.NetworkManager;
 import net.Gabou.gaboulibs.auth.*;
@@ -7,7 +7,7 @@ import net.Gabou.gaboulibs.util.NetworkCompat;
 import net.Gabou.gaboulibs.util.NetworkPayload;
 import net.minecraft.server.level.ServerPlayer;
 
-public final class Identity2FabricNetworkingPlatform implements ModNetworkingPlatform {
+public final class Identity2NeoForgeNetworkingPlatform implements ModNetworkingPlatform {
     private static boolean commonRegistered = false;
     private static boolean clientRegistered = false;
 
@@ -48,17 +48,11 @@ public final class Identity2FabricNetworkingPlatform implements ModNetworkingPla
 
     @Override
     public void sendToPlayer(ServerPlayer player, NetworkPayload payload) {
-        if (player == null || payload == null) {
-            return;
-        }
         NetworkCompat.sendToPlayer(player, payload);
     }
 
     @Override
     public void sendToServer(NetworkPayload payload) {
-        if (payload == null) {
-            return;
-        }
         NetworkCompat.sendToServer(payload);
     }
 }
