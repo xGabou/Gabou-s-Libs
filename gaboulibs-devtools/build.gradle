@@ -1,0 +1,61 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+}
+
+base {
+    archivesName = 'gaboulibs-devtools'
+}
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'org.ow2.asm:asm:9.7.1'
+    implementation 'org.ow2.asm:asm-tree:9.7.1'
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+}
+
+gradlePlugin {
+    plugins {
+        mixinValidator {
+            id = 'net.gabou.gaboulibs.mixin-validator'
+            implementationClass = 'net.gabou.gaboulibs.devtools.mixinvalidator.gradle.GabouMixinValidatorPlugin'
+            displayName = 'GabouLibs Mixin Validator'
+            description = 'Build-time Mixin validator for Minecraft mods using SpongePowered Mixin.'
+        }
+    }
+}
+
+publishing {
+    publications.withType(MavenPublication).configureEach {
+        pom {
+            name = 'GabouLibs Devtools'
+            description = 'Build-time development tools for GabouLibs and GabouLibs-based Minecraft mods.'
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/xGabou/Gabou-s-Libs")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}

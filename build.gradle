@@ -2,11 +2,15 @@ plugins {
     id 'dev.architectury.loom' version '1.11-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id "com.modrinth.minotaur" version "2.8.10" apply false // Modrinth uploader
+    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false // CurseForge uploader
 }
 
 architectury {
     minecraft = project.minecraft_version
 }
+
+
 
 allprojects {
     group = rootProject.maven_group
@@ -17,6 +21,10 @@ subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
+    if (project.name != 'common') {
+        apply plugin: 'com.modrinth.minotaur'
+        apply plugin: 'com.matthewprenger.cursegradle'
+    }
 
     base {
         // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
@@ -24,18 +32,27 @@ subprojects {
     }
 
     repositories {
-        // Add repositories to retrieve artifacts from in here.
-        // You should only use this when depending on other mods because
-        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-        // for more information about repositories.
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url "https://maven.blamejared.com/" }
         maven {
-            name = "CurseMaven"
-            url = "https://cursemaven.com"
+            url "https://www.cursemaven.com"
+            content { includeGroup "curse.maven" }
         }
         maven {
-            url = "https://api.modrinth.com/maven"
+            name = 'GeckoLib'
+            url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+            content {
+                includeGroupByRegex('software\\.bernie.*')
+                includeGroup("com.eliotlash.mclib")
+            }
         }
+        maven { url = "https://api.modrinth.com/maven" }
+        maven {
+            name "nonamecrackers2Maven"
+            url "https://maven.nonamecrackers2.dev/releases"
+        }
+        maven { url "https://maven.theillusivec4.top/" }
+        flatDir { dir 'libs' }
     }
 
     dependencies {
@@ -58,31 +75,68 @@ subprojects {
     }
 
     // Configure Maven publishing.
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                artifactId = base.archivesName.get()
-                from components.java
-            }
+
+
+}
+
+evaluationDependsOn(':common')
+evaluationDependsOn(':gaboulibs-devtools')
+
+tasks.register("validateMixins", JavaExec) {
+    group = "verification"
+    description = "Validates GabouLibs mixin configs using the reusable GabouLibs devtools validator."
+
+    dependsOn(":gaboulibs-devtools:classes", ":common:classes")
+    mainClass = "net.gabou.gaboulibs.devtools.mixinvalidator.MixinValidatorMain"
+    classpath = project(":gaboulibs-devtools").sourceSets.main.runtimeClasspath
+
+    doFirst {
+        def commonProject = project(":common")
+        args = [
+                "--project-dir", rootDir.absolutePath,
+                "--config", file("mixin-validator.json").absolutePath,
+                "--classpath", files(
+                        commonProject.sourceSets.main.output,
+                        commonProject.configurations.compileClasspath,
+                        commonProject.configurations.runtimeClasspath
+                ).asPath,
+                "--resources", files(commonProject.sourceSets.main.resources.srcDirs).asPath,
+                "--sources", files(commonProject.sourceSets.main.allJava.srcDirs).asPath,
+                "--fail-on-error", "true",
+                "--fail-on-warning", "false"
+        ]
+    }
+}
+import groovy.json.JsonOutput
+
+tasks.register("discordWebhook") {
+    doLast {
+        def webhookUrl = System.getenv("DISCORD_WEBHOOK_URL")?.trim()
+        if (!webhookUrl) {
+            println "Skipping Discord webhook notification: DISCORD_WEBHOOK_URL not set."
+            return
         }
 
-        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-        repositories {
-            // Local development publishing targets
-            mavenLocal()
-            maven {
-                name = "localBuildRepo"
-                url = uri("${rootProject.buildDir}/maven-repo")
-            }
-            // The repositories here will be used for publishing your artifact, not for
-            // retrieving dependencies.
+        def changelogText = rootProject.file("gabous.md").text
+
+        def payload = [
+                username        : "Build Bot",
+                allowed_mentions: [parse: ["roles"]],
+                content         : "**New release published!** 🎉\n" +
+                        "Project: ${mod_name}\n" +
+                        "Version: v${project.mod_version}-1.20.1\n\n" +
+                        "${changelogText.take(1891)}"
+        ]
+
+        println "Sending release notification to Discord..."
+        def connection = new URL(webhookUrl).openConnection()
+        connection.with {
+            doOutput = true
+            requestMethod = "POST"
+            setRequestProperty("Content-Type", "application/json")
+            outputStream.withWriter("UTF-8") { it << JsonOutput.toJson(payload) }
+            println "Webhook sent with response code: ${responseCode}"
         }
     }
 }
 
-// Convenience task to publish all platform jars to mavenLocal
-tasks.register('publishAllToMavenLocal') {
-    group = 'publishing'
-    description = 'Publishes common, fabric and forge modules to mavenLocal.'
-    dependsOn ':common:publishToMavenLocal', ':fabric:publishToMavenLocal', ':forge:publishToMavenLocal'
-}
