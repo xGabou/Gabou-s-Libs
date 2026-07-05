@@ -1,6 +1,7 @@
 # Gabou's Libs - Changelog
 
 ### Added
+- Migrated the anti-cracked launcher here instead of directly into my mods
 ### Fixed / Behavior
+- Changed a method to return a boolean
 ### Changed
-- SnowGenerator: Added getter and setter for the `snowHeight` field, allowing users to customize the height of the generated snow.

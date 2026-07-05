@@ -1,0 +1,7 @@
+{
+  "modId": "gaboulibs",
+  "mixinConfigs": [
+    "gaboulibs.mixins.json"
+  ],
+  "optionalTargets": []
+}
