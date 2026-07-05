@@ -1,6 +1,8 @@
 package net.Gabou.gaboulibs.neoforge.auth;
 
 import dev.architectury.networking.NetworkManager;
+import dev.architectury.platform.Platform;
+import dev.architectury.utils.Env;
 import net.Gabou.gaboulibs.auth.*;
 import net.Gabou.gaboulibs.platform.ModNetworkingPlatform;
 import net.Gabou.gaboulibs.util.NetworkCompat;
@@ -18,7 +20,9 @@ public final class Identity2NeoForgeNetworkingPlatform implements ModNetworkingP
         }
         commonRegistered = true;
 
-        NetworkManager.registerS2CPayloadType(S2CChallengePacket.TYPE, S2CChallengePacket.STREAM_CODEC);
+        if (Platform.getEnvironment() == Env.SERVER) {
+            NetworkManager.registerS2CPayloadType(S2CChallengePacket.TYPE, S2CChallengePacket.STREAM_CODEC);
+        }
         NetworkCompat.registerReceiver(
             NetworkManager.c2s(),
             C2SChallengeReplyPacket.TYPE,
