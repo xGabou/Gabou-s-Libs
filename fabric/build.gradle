@@ -1,8 +1,9 @@
-plugins {
-    id 'com.github.johnrengelman.shadow'
-    id 'com.matthewprenger.cursegradle' version '1.4.0' // CurseForge uploader
-    id "com.modrinth.minotaur" version "2.8.10" // Modrinth uploader
-}
+import io.github.themrmilchmann.gradle.publish.curseforge.ChangelogFormat
+import io.github.themrmilchmann.gradle.publish.curseforge.ReleaseType
+
+apply plugin: 'com.gradleup.shadow'
+apply plugin: "io.github.themrmilchmann.curseforge-publish"
+apply plugin: "com.modrinth.minotaur"
 
 architectury {
     platformSetupLoomIde()
@@ -32,14 +33,14 @@ configurations {
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+    implementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+    implementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
 
-    modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
+    implementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
 
-    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
-    shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+    common(project(':common')) { transitive false }
+    shadowBundle project(':common')
 }
 
 processResources {
@@ -55,15 +56,34 @@ shadowJar {
     archiveClassifier = 'dev-shadow'
 }
 
-remapJar {
-    input.set shadowJar.archiveFile
-    archiveClassifier.set('')
-}
 build.dependsOn shadowJar
-shadowJar.finalizedBy(remapJar)
 
+curseforge {
+    apiToken = System.getenv("CURSEFORGE_TOKEN")
 
-def remappedJar = tasks.remapJar.archiveFile
+    publications {
+        register("curseForge") {
+            projectId = "1367332"
+
+            gameVersion "minecraft", rootProject.minecraft_version
+            gameVersion "modloader", "fabric"
+
+            artifacts.register("main") {
+                displayName = "Fabric-${project.version}"
+                releaseType = ReleaseType.RELEASE
+
+                changelog {
+                    format = ChangelogFormat.MARKDOWN
+                    from(rootProject.file("GabousLibs.md"))
+                }
+
+                from(tasks.named("shadowJar"))
+            }
+        }
+    }
+}
+
+def packagedJar = tasks.shadowJar.archiveFile
 
 modrinth {
     token = System.getenv("MODRINTH_TOKEN")
@@ -71,25 +91,10 @@ modrinth {
     versionNumber = "Fabric-${project.version}"
     versionName = "Serene Seasons Plus ${mod_version}"
     changelog = rootProject.file("GabousLibs.md").text
-    gameVersions = ["1.21.11"]
+    gameVersions = ["26.2"]
     loaders = ["fabric"]
     versionType = "release"
-    uploadFile = remappedJar
-}
-
-curseforge {
-    apiKey = System.getenv("CURSEFORGE_TOKEN")
-
-    project {
-        id = "1367332"
-        changelog = rootProject.file("GabousLibs.md")
-        releaseType = "release"
-        addGameVersion "1.21.11"
-        addGameVersion "Fabric"
-        mainArtifact(remappedJar) {
-            displayName = "Fabric-${version}"
-        }
-    }
+    uploadFile = packagedJar
 }
 
 
