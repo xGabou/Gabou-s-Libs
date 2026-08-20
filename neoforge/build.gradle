@@ -1,8 +1,12 @@
+import io.github.themrmilchmann.gradle.publish.curseforge.ChangelogFormat
+import io.github.themrmilchmann.gradle.publish.curseforge.ReleaseType
+
 plugins {
-    id 'com.github.johnrengelman.shadow'
-    id 'com.matthewprenger.cursegradle' version '1.4.0' // CurseForge uploader
+    id 'com.gradleup.shadow'
     id "com.modrinth.minotaur" version "2.8.10" // Modrinth uploader
 }
+
+apply plugin: "io.github.themrmilchmann.curseforge-publish"
 
 architectury {
     platformSetupLoomIde()
@@ -71,19 +75,31 @@ modrinth {
     gameVersions = ["1.21.11"]
     loaders = ["neoforge"]
     versionType = "release"
-    uploadFile = file("build/libs/${archivesBaseName}-${version}.jar")
+    uploadFile = tasks.named("remapJar").flatMap { it.archiveFile }
 }
 curseforge {
-    apiKey = System.getenv("CURSEFORGE_TOKEN")
+    apiToken = System.getenv("CURSEFORGE_TOKEN")
 
-    project {
-        id = "1367332"
-        changelog = rootProject.file("GabousLibs.md")
-        releaseType = "release" // options: alpha, beta, release
-        addGameVersion "1.21.11"
-        addGameVersion "NeoForge"
-        mainArtifact(file("build/libs/${archivesBaseName}-${version}.jar")) {
-            displayName = "NeoForge-${version}"
+    publications {
+        register("curseForge") {
+            projectId = "1367332"
+
+            gameVersion rootProject.curseforge_minecraft_version_type, rootProject.curseforge_minecraft_version
+            gameVersion "modloader", "neoforge"
+            gameVersion "environment", "client"
+            gameVersion "environment", "server"
+
+            artifacts.register("main") {
+                displayName = "NeoForge-${project.version}"
+                releaseType = ReleaseType.RELEASE
+
+                changelog {
+                    format = ChangelogFormat.MARKDOWN
+                    from(rootProject.file("GabousLibs.md"))
+                }
+
+                from(tasks.named("remapJar"))
+            }
         }
     }
 }

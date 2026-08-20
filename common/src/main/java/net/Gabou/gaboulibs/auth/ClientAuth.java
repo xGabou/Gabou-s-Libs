@@ -12,6 +12,11 @@ public final class ClientAuth {
             return;
         }
 
+        if (ReplayModCompatibility.isReplayActive()) {
+            ReplayModCompatibility.logActiveCompatibilityPath();
+            return;
+        }
+
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft == null || minecraft.player == null) {
             return;

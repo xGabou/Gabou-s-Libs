@@ -1,8 +1,12 @@
+import io.github.themrmilchmann.gradle.publish.curseforge.ChangelogFormat
+import io.github.themrmilchmann.gradle.publish.curseforge.ReleaseType
+
 plugins {
-    id 'com.github.johnrengelman.shadow'
-    id 'com.matthewprenger.cursegradle' version '1.4.0' // CurseForge uploader
+    id 'com.gradleup.shadow'
     id "com.modrinth.minotaur" version "2.8.10" // Modrinth uploader
 }
+
+apply plugin: "io.github.themrmilchmann.curseforge-publish"
 
 architectury {
     platformSetupLoomIde()
@@ -31,6 +35,11 @@ configurations {
     }
 }
 
+def replayCompat = providers.gradleProperty("replayCompat").orElse("none").get()
+if (!(replayCompat in ["none", "flashback", "replaymod"])) {
+    throw new GradleException("Unsupported replayCompat value '${replayCompat}'. Use none, flashback, or replaymod.")
+}
+
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
@@ -40,6 +49,12 @@ dependencies {
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+
+    if (replayCompat == "flashback") {
+        modLocalRuntime "maven.modrinth:flashback:3GzWAKj5"
+    } else if (replayCompat == "replaymod") {
+        modLocalRuntime "maven.modrinth:replaymod:LcmLujKZ"
+    }
 }
 
 processResources {
@@ -78,16 +93,28 @@ modrinth {
 }
 
 curseforge {
-    apiKey = System.getenv("CURSEFORGE_TOKEN")
+    apiToken = System.getenv("CURSEFORGE_TOKEN")
 
-    project {
-        id = "1367332"
-        changelog = rootProject.file("GabousLibs.md")
-        releaseType = "release"
-        addGameVersion "1.21.11"
-        addGameVersion "Fabric"
-        mainArtifact(remappedJar) {
-            displayName = "Fabric-${version}"
+    publications {
+        register("curseForge") {
+            projectId = "1367332"
+
+            gameVersion rootProject.curseforge_minecraft_version_type, rootProject.curseforge_minecraft_version
+            gameVersion "modloader", "fabric"
+            gameVersion "environment", "client"
+            gameVersion "environment", "server"
+
+            artifacts.register("main") {
+                displayName = "Fabric-${project.version}"
+                releaseType = ReleaseType.RELEASE
+
+                changelog {
+                    format = ChangelogFormat.MARKDOWN
+                    from(rootProject.file("GabousLibs.md"))
+                }
+
+                from(tasks.named("remapJar"))
+            }
         }
     }
 }

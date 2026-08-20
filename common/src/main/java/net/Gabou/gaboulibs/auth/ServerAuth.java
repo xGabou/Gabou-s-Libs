@@ -12,12 +12,21 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class ServerAuth {
+    private static final long ACCOUNT_VERIFICATION_TIMEOUT_MS = 60_000L;
+
     private ServerAuth() {
     }
-    private final static boolean authStrictOfflineUuidReject = false;
-
     public static boolean onLogin(ServerPlayer player) {
         onLogout(player);
+
+        ReplayDetection replayDetection = ReplayCompatibility.detectServerReplay(player);
+        if (replayDetection.detected()) {
+            Gaboulibs.LOGGER.info(
+                    "Replay identity detected for {}; using {} compatibility path: {}.",
+                    profileName(player), replayDetection.environment(), replayDetection.reason()
+            );
+            return true;
+        }
 
         if (Platform.isDevelopmentEnvironment()) {
             Gaboulibs.LOGGER.info(
@@ -29,21 +38,7 @@ public final class ServerAuth {
 
         AuthResult joinResult = verifyJoin(player, player.getGameProfile());
         if (!joinResult.allowed()) {
-            Gaboulibs.LOGGER.warn(
-                    "Rejected {} during launcher verification: {}",
-                    player.getGameProfile().name(),
-                    joinResult.reason()
-            );
-            player.connection.disconnect(Component.literal("Authentication rejected."));
-            return false;
-        }
-
-        if (AuthGuards.isLikelyOfflineUuid(player) && authStrictOfflineUuidReject) {
-            Gaboulibs.LOGGER.warn(
-                "Rejected {} because strict auth mode disallows offline UUID v3 identities.",
-                player.getGameProfile().name()
-            );
-            player.connection.disconnect(Component.literal("Authentication rejected."));
+            reject(player, joinResult.reason());
             return false;
         }
 
@@ -57,17 +52,19 @@ public final class ServerAuth {
             return AuthResult.block("TLauncher or invalid launcher detected: " + launcherReason);
         }
 
-        McAccountResult accountResult = MinecraftAccountVerifier.verifyWithTimeout(profile, 5000L);
+        boolean serverUsesAuthentication = player != null
+                && player.level().getServer() != null
+                && player.level().getServer().usesAuthentication();
+        McAccountResult accountResult = MinecraftAccountVerifier.verifyWithTimeout(
+                profile,
+                serverUsesAuthentication,
+                ACCOUNT_VERIFICATION_TIMEOUT_MS
+        );
         if (accountResult.passed()) {
             return AuthResult.allow(AuthTrustLevel.VERIFIED);
         }
 
-        Gaboulibs.LOGGER.warn(
-                "Minecraft account verification failed or timed out for {}: {}. Allowing because launcher detection passed.",
-                profile == null ? "<unknown>" : profile.name(),
-                accountResult.reason()
-        );
-        return AuthResult.allow(AuthTrustLevel.TLAUNCHER_CHECK_PASSED);
+        return AuthResult.block("Minecraft account verification failed: " + accountResult.reason());
     }
 
     public static void sendChallenge(ServerPlayer player) {
@@ -122,11 +119,7 @@ public final class ServerAuth {
             }
 
             PendingAuthManager.clear(uuid);
-
-            Gaboulibs.LOGGER.warn(
-                    "Auth challenge timed out for {}; allowing because launcher detection already passed.",
-                    player.getGameProfile().name()
-            );
+            reject(player, "authentication challenge timed out");
         }
     }
 
@@ -173,10 +166,16 @@ public final class ServerAuth {
 
     private static void markInvalid(ServerPlayer player, String reason) {
         PendingAuthManager.clear(player);
-        Gaboulibs.LOGGER.warn(
-            "Auth verification failed for {}; allowing because launcher detection already passed: {}",
-            player.getGameProfile().name(),
-            reason
-        );
+        reject(player, "authentication challenge failed: " + reason);
+    }
+
+    private static void reject(ServerPlayer player, String reason) {
+        Gaboulibs.LOGGER.warn("Rejected {} during authentication: {}.", profileName(player), reason);
+        player.connection.disconnect(Component.literal("Authentication rejected."));
+    }
+
+    private static String profileName(ServerPlayer player) {
+        if (player == null || player.getGameProfile() == null || player.getGameProfile().name() == null) return "<unknown>";
+        return player.getGameProfile().name();
     }
 }
