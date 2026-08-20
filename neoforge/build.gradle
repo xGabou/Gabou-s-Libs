@@ -45,7 +45,7 @@ dependencies {
     implementation "dev.architectury:architectury-neoforge:$rootProject.architectury_api_version"
 
     common(project(':common')) { transitive false }
-    shadowBundle project(':common')
+    shadowBundle(project(':common')) { transitive false }
 }
 
 processResources {
@@ -56,10 +56,14 @@ processResources {
     }
 }
 
+jar {
+    archiveClassifier = 'dev'
+}
+
 shadowJar {
     exclude "fabric.mod.json"
     configurations = [project.configurations.shadowBundle]
-    archiveClassifier = 'dev-shadow'
+    archiveClassifier = ''
 }
 
 curseforge {
@@ -69,8 +73,10 @@ curseforge {
         register("curseForge") {
             projectId = "1367332"
 
-            gameVersion "minecraft", rootProject.minecraft_version
+            gameVersion rootProject.curseforge_minecraft_version_type, rootProject.curseforge_minecraft_version
             gameVersion "modloader", "neoforge"
+            gameVersion "environment", "client"
+            gameVersion "environment", "server"
 
             artifacts.register("main") {
                 displayName = "NeoForge-${project.version}"
@@ -87,7 +93,7 @@ curseforge {
     }
 }
 
-def packagedJar = tasks.shadowJar.archiveFile
+def packagedJar = tasks.named("shadowJar").flatMap { it.archiveFile }
 modrinth {
     token = System.getenv("MODRINTH_TOKEN")
     projectId = "N8aGZtvj" // from your Modrinth project URL

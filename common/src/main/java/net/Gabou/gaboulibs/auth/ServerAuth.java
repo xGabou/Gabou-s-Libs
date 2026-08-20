@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class ServerAuth {
+    private static final long ACCOUNT_VERIFICATION_TIMEOUT_MS = 60_000L;
+
     private ServerAuth() {
     }
     private final static boolean authStrictOfflineUuidReject = false;
@@ -57,7 +59,10 @@ public final class ServerAuth {
             return AuthResult.block("TLauncher or invalid launcher detected: " + launcherReason);
         }
 
-        McAccountResult accountResult = MinecraftAccountVerifier.verifyWithTimeout(profile, 5000L);
+        McAccountResult accountResult = MinecraftAccountVerifier.verifyWithTimeout(
+                profile,
+                ACCOUNT_VERIFICATION_TIMEOUT_MS
+        );
         if (accountResult.passed()) {
             return AuthResult.allow(AuthTrustLevel.VERIFIED);
         }

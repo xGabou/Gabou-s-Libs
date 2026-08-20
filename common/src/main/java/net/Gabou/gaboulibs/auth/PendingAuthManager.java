@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public final class PendingAuthManager {
 
-    private final static int authChallengeTimeoutTicks = 600;
+    private static final int AUTH_CHALLENGE_TIMEOUT_TICKS = 20 * 60;
 
     public record PendingAuth(
             long nonce,
@@ -117,6 +117,6 @@ public final class PendingAuthManager {
     }
 
     public static long getTimeoutMs() {
-        return Math.max(1, authChallengeTimeoutTicks) * 50L;
+        return AUTH_CHALLENGE_TIMEOUT_TICKS * 50L;
     }
 }
