@@ -1,6 +1,5 @@
 package net.Gabou.gaboulibs;
 
-import net.Gabou.gaboulibs.auth.ClientLauncherGuards;
 
 public class GaboulibsClient {
     public static final GaboulibsClient INSTANCE = new GaboulibsClient();
@@ -12,8 +11,6 @@ public class GaboulibsClient {
             return;
         }
 
-        ClientLauncherGuards.enforce();
-        ModNetworking.initClient();
         initialized = true;
     }
 
