@@ -1,7 +1,5 @@
-# Gabou's Libs - Changelog
+# Gabou's Libs
 
-### Added
-- Migrated the anti-cracked launcher here instead of directly into my mods
-### Fixed / Behavior
-- Changed a method to return a boolean
 ### Changed
+- Removed the auth.
+- Increased the account-verification timeout to 60 seconds.
