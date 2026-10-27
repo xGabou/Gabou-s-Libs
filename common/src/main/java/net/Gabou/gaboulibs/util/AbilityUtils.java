@@ -8,6 +8,7 @@ package net.Gabou.gaboulibs.util;
 
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -112,7 +113,7 @@ public class AbilityUtils {
                     0.1D,
                     dz / distance * strength
             );
-            living.hurtMarked = true;
+            living.syncVelocity = true;
         }
     }
 
@@ -126,7 +127,7 @@ public class AbilityUtils {
                 current.y,
                 look.z * distance
         );
-        player.hurtMarked = true;
+        player.syncVelocity = true;
     }
 
 
@@ -139,7 +140,7 @@ public class AbilityUtils {
 
             if (!stack.isEmpty()) {
                 ItemStack dropped = stack.split(1);
-                player.drop(dropped, false);
+                player.drop(dropped, false, Prediction.SERVER_ONLY);
             }
         }
     }
@@ -173,7 +174,7 @@ public class AbilityUtils {
         for (LivingEntity living : entities) {
             living.setDeltaMovement(Vec3.ZERO);
             living.setNoGravity(true);
-            living.hurtMarked = true;
+            living.syncVelocity = true;
         }
     }
 
@@ -181,7 +182,7 @@ public class AbilityUtils {
     public static void dashUpward(Player player, double power) {
         Vec3 current = player.getDeltaMovement();
         player.setDeltaMovement(current.x, power, current.z);
-        player.hurtMarked = true;
+        player.syncVelocity = true;
     }
 
 
@@ -192,7 +193,7 @@ public class AbilityUtils {
             Vec3 added = new Vec3(look.x * power, look.y * 0.5D, look.z * power);
 
             player.setDeltaMovement(current.add(added));
-            player.hurtMarked = true;
+            player.syncVelocity = true;
         }
     }
 
@@ -212,7 +213,7 @@ public class AbilityUtils {
                 0.2D,
                 direction.z * strength
         );
-        target.hurtMarked = true;
+        target.syncVelocity = true;
     }
 
 

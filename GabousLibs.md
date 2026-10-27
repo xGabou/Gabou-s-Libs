@@ -1,5 +1,5 @@
 # Gabou's Libs
 
 ### Changed
-- Removed the auth.
+- Port to 26.3
 
